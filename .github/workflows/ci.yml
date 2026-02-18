@@ -1,0 +1,35 @@
+name: Homebrew tap CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-dev-formula:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        run: |
+          brew update
+
+      - name: Register local tap
+        run: |
+          brew tap d3mlabs/d3mlabs "$GITHUB_WORKSPACE"
+
+      - name: Audit dev formula
+        run: |
+          brew audit --strict d3mlabs/dev
+
+      - name: Install dev from tap
+        run: |
+          brew install d3mlabs/dev
+
+      - name: Run dev formula tests
+        run: |
+          brew test d3mlabs/dev
