@@ -3,11 +3,11 @@
 class Dev < Formula
   desc "Find git repo with dev.yml and run declared commands (d3mlabs convention)"
   homepage "https://github.com/d3mlabs/dev"
-  version "0.1.0"
+  version "0.1.1"
   depends_on "ruby"
   # Point at tagged release tarball from d3mlabs/dev repo
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "7c67d8713e0ddbb1cac97a69efd13c44e06722ad8ed488a7d3d1921965859175"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.1.1.tar.gz"
+  sha256 "d42c0a05767f32566f9f85ceb3f2e4ba967e47ef8801cb2363ec73a19dd5b2e4"
 
   def install
     bin.install "dev"
