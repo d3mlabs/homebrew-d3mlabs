@@ -7,7 +7,7 @@ class Dev < Formula
   depends_on "ruby"
   # Point at tagged release tarball from d3mlabs/dev repo
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "b14942d2c59d1a6aeb8119a450e8271b61dded2ecada03a03740d035033918ea"
+  sha256 "a8ee30bc64fced78b9028a274e1f1125ebade6d6d31b5a35e7153b3102fbf535"
 
   def install
     bin.install "dev"
