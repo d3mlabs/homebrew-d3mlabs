@@ -6,7 +6,7 @@ class Dev < Formula
   version "0.2.4"
   depends_on "ruby"
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.4.tar.gz"
-  sha256 "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed"
+  sha256 "25f483aef6b862f0b2e15bad9c6cb9475b377115ce24c041bebaf5cd49a4ef4a"
 
   def install
     bin.install "dev"
