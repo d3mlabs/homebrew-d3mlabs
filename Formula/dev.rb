@@ -3,21 +3,21 @@
 class Dev < Formula
   desc "Find repo with dev.yml and run declared commands (d3mlabs convention)"
   homepage "https://github.com/d3mlabs/dev"
-  version "0.2.14"
+  version "0.2.15"
   depends_on "ruby"
   depends_on "rbenv"
   depends_on "ruby-build"
   depends_on "shadowenv"
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.14.tar.gz"
-  sha256 "799538d8fe95aa8048d56a6deabc78ed7f712a197c86c6a3c0403e971d11811f"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.15.tar.gz"
+  sha256 "567ccd934778a5e49e879e30c657d49a3931a454ef0b68eef2e87cec9af15a5c"
 
   def install
-    (libexec/"dev").install "dev", "src"
-    bin.install_symlink libexec/"dev/dev" => "dev"
+    (libexec/"dev").install "bin", "src"
+    bin.install_symlink libexec/"dev/bin/dev" => "dev"
   end
 
   test do
     output = shell_output("#{bin}/dev 2>&1", 1)
-    assert_match(/no dev\.yml found/, output)
+    assert_match(/no dev\.yml/, output)
   end
 end
