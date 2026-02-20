@@ -5,6 +5,7 @@ class Dev < Formula
   homepage "https://github.com/d3mlabs/dev"
   version "0.2.4"
   depends_on "ruby"
+  depends_on "shadowenv"
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.4.tar.gz"
   sha256 "25f483aef6b862f0b2e15bad9c6cb9475b377115ce24c041bebaf5cd49a4ef4a"
 
