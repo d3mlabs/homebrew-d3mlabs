@@ -9,7 +9,7 @@ class Dev < Formula
   depends_on "ruby-build"
   depends_on "shadowenv"
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.13.tar.gz"
-  sha256 "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed"
+  sha256 "c323dcdd9754cda73b952ec37db53a09a6e53f8e20adbfbfbe962503c4ec564f"
 
   def install
     (libexec/"dev").install "dev", "src"
