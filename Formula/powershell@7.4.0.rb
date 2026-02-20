@@ -14,7 +14,10 @@ class PowershellAT740 < Formula
     on_linux do
       deb = Pathname.glob(buildpath/"*.deb").first
       odie "No .deb found" unless deb&.exist?
+      # Install .deb (dpkg -i doesn't auto-resolve deps, may leave package in broken state)
       system "dpkg", "-i", deb
+      # Fix any missing dependencies (apt-get install -f resolves broken dependencies)
+      system "apt-get", "install", "-f", "-y"
     end
   end
 
