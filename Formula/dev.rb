@@ -21,8 +21,7 @@ class Dev < Formula
 
     (libexec/"dev").install "bin", "src"
     (bin/"dev").write_env_script(libexec/"dev/bin/dev",
-      GEM_HOME: libexec,
-      PATH:     "#{Formula["ruby"].opt_bin}:#{libexec}/bin:$PATH")
+      GEM_HOME: libexec)
   end
 
   test do
