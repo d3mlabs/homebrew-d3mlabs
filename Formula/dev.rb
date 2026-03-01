@@ -3,9 +3,9 @@
 class Dev < Formula
   desc "Find repo with dev.yml and run declared commands (d3mlabs convention)"
   homepage "https://github.com/d3mlabs/dev"
-  version "0.2.20"
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.20.tar.gz"
-  sha256 "b5c0c71a6d022f1a13388fcf723d454af24c1474d43020d37a4e75751098785b"
+  version "0.2.22"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.22.tar.gz"
+  sha256 "9abb0b5078f3a9e9125c96ff94ca4d78f68424e4b4f40061d45ce580bdd1b6ac"
 
   depends_on "ruby"
   depends_on "rbenv"
@@ -19,7 +19,7 @@ class Dev < Formula
     system "bundle", "config", "set", "--local", "path.system", "true"
     system "bundle", "install"
 
-    (libexec/"dev").install "bin", "src"
+    (libexec/"dev").install "bin", "src", "lib"
     (bin/"dev").write_env_script(libexec/"dev/bin/dev",
       GEM_HOME: libexec)
   end
