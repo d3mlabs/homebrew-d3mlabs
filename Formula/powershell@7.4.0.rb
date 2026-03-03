@@ -14,10 +14,11 @@ class PowershellAT740 < Formula
     on_linux do
       deb = Pathname.glob(buildpath/"*.deb").first
       odie "No .deb found" unless deb&.exist?
-      # Install .deb (dpkg -i doesn't auto-resolve deps, may leave package in broken state)
-      system "dpkg", "-i", deb
-      # Fix any missing dependencies (apt-get install -f resolves broken dependencies)
-      system "apt-get", "install", "-f", "-y"
+      # Extract .deb into Homebrew prefix instead of dpkg -i (which installs
+      # system-wide and leaves the Cellar empty, causing "Empty installation").
+      system "dpkg-deb", "-x", deb, "extracted"
+      libexec.install Dir["extracted/opt/microsoft/powershell/7/*"]
+      bin.install_symlink libexec/"pwsh"
     end
   end
 
