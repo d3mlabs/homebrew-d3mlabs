@@ -33,8 +33,10 @@ class Dev < Formula
     ENV["GEM_HOME"] = libexec
     ENV["GEM_PATH"] = libexec
 
+    # Homebrew fetches resources during the unsandboxed fetch phase, so
+    # reference the already-downloaded file here. Calling r.fetch inside
+    # install would re-download under the sandbox and fail.
     resources.each do |r|
-      r.fetch
       system "gem", "install", r.cached_download,
              "--no-document", "--ignore-dependencies", "--install-dir", libexec
     end
