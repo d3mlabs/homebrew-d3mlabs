@@ -13,11 +13,20 @@ class Dev < Formula
   depends_on "shadowenv"
 
   def install
+    # GEM_PATH must also point at libexec: dependency resolution consults the
+    # ambient gem path, so without this, deps already present on the build
+    # machine (e.g. in Homebrew ruby's site gems) would be skipped instead of
+    # vendored.
     ENV["GEM_HOME"] = libexec
-    ENV["BUNDLE_WITHOUT"] = "development test"
+    ENV["GEM_PATH"] = libexec
 
-    system "bundle", "config", "set", "--local", "path.system", "true"
-    system "bundle", "install"
+    # Vendor runtime dependencies (declared in dev.gemspec) into libexec by
+    # building and installing dev as a gem. Unlike `bundle install` with
+    # system gems, this guarantees every runtime dep lands in libexec
+    # regardless of which gems the build machine already has, so the wrapper
+    # works under any >= 2.7 ruby (rbenv, shadowenv-pinned, or Homebrew).
+    system "gem", "build", "dev.gemspec", "--output", "dev.gem"
+    system "gem", "install", "--no-document", "dev.gem"
 
     (libexec/"dev").install "bin", "src", "lib"
     (bin/"dev").write_env_script(libexec/"dev/bin/dev",
