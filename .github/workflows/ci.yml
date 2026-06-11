@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dev from tap
         run: |
-          brew install d3mlabs/d3mlabs/dev
+          brew install --verbose d3mlabs/d3mlabs/dev
 
       - name: Run dev formula tests
         run: |
