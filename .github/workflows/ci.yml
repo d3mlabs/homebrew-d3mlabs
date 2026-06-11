@@ -24,12 +24,12 @@ jobs:
 
       - name: Audit dev formula
         run: |
-          brew audit --strict d3mlabs/dev
+          brew audit --strict d3mlabs/d3mlabs/dev
 
       - name: Install dev from tap
         run: |
-          brew install d3mlabs/dev
+          brew install d3mlabs/d3mlabs/dev
 
       - name: Run dev formula tests
         run: |
-          brew test d3mlabs/dev
+          brew test d3mlabs/d3mlabs/dev
