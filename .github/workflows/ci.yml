@@ -30,6 +30,12 @@ jobs:
         run: |
           brew install --verbose d3mlabs/d3mlabs/dev
 
+      - name: Dump Homebrew build logs on failure
+        if: failure()
+        run: |
+          echo "=== ~/Library/Logs/Homebrew/dev ==="
+          cat ~/Library/Logs/Homebrew/dev/* 2>/dev/null || echo "(no logs)"
+
       - name: Run dev formula tests
         run: |
           brew test d3mlabs/d3mlabs/dev
