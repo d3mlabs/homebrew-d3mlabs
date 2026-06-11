@@ -11,25 +11,36 @@ class Dev < Formula
   depends_on "ruby-build"
   depends_on "shadowenv"
 
+  # Runtime gems (dev.gemspec). Vendored as resources so they're fetched
+  # before Homebrew's network-less build sandbox and installed offline — a
+  # plain `gem install` would reach rubygems.org mid-build and fail. Both are
+  # dependency-free, so no transitive resources are needed.
+  resource "cli-ui" do
+    url "https://rubygems.org/downloads/cli-ui-2.7.0.gem"
+    sha256 "e36147f2e8088796b996f0560f577bd1599f2b6aa3c374fe09fff59af5589c35"
+  end
+
+  resource "sorbet-runtime" do
+    url "https://rubygems.org/downloads/sorbet-runtime-0.6.13295.gem"
+    sha256 "c61a89c1a2c6ed79b4d38c64b9ce2c03de4d362e6803be2a871562000964114e"
+  end
+
   def install
-    # GEM_PATH must also point at libexec: dependency resolution consults the
-    # ambient gem path, so without this, deps already present on the build
-    # machine (e.g. in Homebrew ruby's site gems) would be skipped instead of
-    # vendored.
+    # Vendor runtime gems into libexec. GEM_HOME/GEM_PATH point there so the
+    # wrapper (run with GEM_HOME=libexec) resolves them under any >= 3.1 ruby
+    # (rbenv, shadowenv-pinned, or Homebrew), independent of the build
+    # machine's gems.
     ENV["GEM_HOME"] = libexec
     ENV["GEM_PATH"] = libexec
 
-    # Vendor runtime dependencies (declared in dev.gemspec) into libexec by
-    # building and installing dev as a gem. Unlike `bundle install` with
-    # system gems, this guarantees every runtime dep lands in libexec
-    # regardless of which gems the build machine already has, so the wrapper
-    # works under any >= 2.7 ruby (rbenv, shadowenv-pinned, or Homebrew).
-    system "gem", "build", "dev.gemspec", "--output", "dev.gem"
-    system "gem", "install", "--no-document", "dev.gem"
+    resources.each do |r|
+      r.fetch
+      system "gem", "install", r.cached_download,
+             "--no-document", "--ignore-dependencies", "--install-dir", libexec
+    end
 
     (libexec/"dev").install "bin", "src", "lib"
-    (bin/"dev").write_env_script(libexec/"dev/bin/dev",
-      GEM_HOME: libexec)
+    (bin/"dev").write_env_script(libexec/"dev/bin/dev", GEM_HOME: libexec)
   end
 
   test do
