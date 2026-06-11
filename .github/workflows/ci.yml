@@ -27,6 +27,8 @@ jobs:
           brew audit --strict d3mlabs/d3mlabs/dev
 
       - name: Install dev from tap
+        env:
+          HOMEBREW_NO_SANDBOX: "1"
         run: |
           brew install --verbose d3mlabs/d3mlabs/dev
 
