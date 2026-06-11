@@ -26,9 +26,19 @@ jobs:
         run: |
           brew audit --strict d3mlabs/d3mlabs/dev
 
+      - name: Debug - environment and plain gem install
+        run: |
+          set -x
+          brew --version
+          export PATH="$(brew --prefix ruby)/bin:$PATH"
+          ruby -v
+          gem -v
+          dest="$(mktemp -d)"
+          gem install cli-ui -v 2.7.0 --no-document --ignore-dependencies --install-dir "$dest" || echo "cli-ui FAILED rc=$?"
+          gem install sorbet-runtime -v 0.6.13295 --no-document --ignore-dependencies --install-dir "$dest" || echo "sorbet-runtime FAILED rc=$?"
+          ls -la "$dest/gems" || true
+
       - name: Install dev from tap
-        env:
-          HOMEBREW_NO_SANDBOX: "1"
         run: |
           brew install --verbose d3mlabs/d3mlabs/dev
 
@@ -37,6 +47,8 @@ jobs:
         run: |
           echo "=== ~/Library/Logs/Homebrew/dev ==="
           cat ~/Library/Logs/Homebrew/dev/* 2>/dev/null || echo "(no logs)"
+          echo "=== brew gist-logs (last build) ==="
+          ls -la ~/Library/Logs/Homebrew/ 2>/dev/null || true
 
       - name: Run dev formula tests
         run: |
