@@ -3,8 +3,8 @@
 class Dev < Formula
   desc "Find repo with dev.yml and run declared commands (d3mlabs convention)"
   homepage "https://github.com/d3mlabs/dev"
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.43.tar.gz"
-  sha256 "d84549f4ec26e297463b89c33ea0e589678eeaefde973e952a5296e7545ae4b2"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.44.tar.gz"
+  sha256 "be776d458d9350c6bba6fd07ac298894b4261cb342aeeffe967e4e33cab55629"
 
   depends_on "rbenv"
   depends_on "ruby"
@@ -17,12 +17,12 @@ class Dev < Formula
   # dependency-free, so no transitive resources are needed.
   resource "cli-ui" do
     url "https://rubygems.org/downloads/cli-ui-2.7.0.gem"
-    sha256 "d84549f4ec26e297463b89c33ea0e589678eeaefde973e952a5296e7545ae4b2"
+    sha256 "be776d458d9350c6bba6fd07ac298894b4261cb342aeeffe967e4e33cab55629"
   end
 
   resource "sorbet-runtime" do
     url "https://rubygems.org/downloads/sorbet-runtime-0.6.13295.gem"
-    sha256 "d84549f4ec26e297463b89c33ea0e589678eeaefde973e952a5296e7545ae4b2"
+    sha256 "be776d458d9350c6bba6fd07ac298894b4261cb342aeeffe967e4e33cab55629"
   end
 
   def install
