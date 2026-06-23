@@ -17,12 +17,12 @@ class Dev < Formula
   # dependency-free, so no transitive resources are needed.
   resource "cli-ui" do
     url "https://rubygems.org/downloads/cli-ui-2.7.0.gem"
-    sha256 "be776d458d9350c6bba6fd07ac298894b4261cb342aeeffe967e4e33cab55629"
+    sha256 "e36147f2e8088796b996f0560f577bd1599f2b6aa3c374fe09fff59af5589c35"
   end
 
   resource "sorbet-runtime" do
     url "https://rubygems.org/downloads/sorbet-runtime-0.6.13295.gem"
-    sha256 "be776d458d9350c6bba6fd07ac298894b4261cb342aeeffe967e4e33cab55629"
+    sha256 "c61a89c1a2c6ed79b4d38c64b9ce2c03de4d362e6803be2a871562000964114e"
   end
 
   def install
