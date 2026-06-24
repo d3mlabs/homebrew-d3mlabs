@@ -34,3 +34,28 @@ jobs:
 
       - name: Run dev formula tests
         run: brew test d3mlabs/d3mlabs/dev
+
+  test-clang-format-formula:
+    runs-on: macos-latest
+
+    env:
+      HOMEBREW_NO_REQUIRE_TAP_TRUST: "1"
+
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        run: brew update
+
+      - name: Register local tap
+        run: brew tap d3mlabs/d3mlabs "$GITHUB_WORKSPACE"
+
+      - name: Audit clang-format formula
+        run: brew audit --strict d3mlabs/d3mlabs/clang-format@18.1.8
+
+      - name: Install clang-format from tap
+        run: brew install d3mlabs/d3mlabs/clang-format@18.1.8
+
+      - name: Run clang-format formula tests
+        run: brew test d3mlabs/d3mlabs/clang-format@18.1.8
