@@ -30,6 +30,12 @@ brew tap d3mlabs/d3mlabs
   brew install d3mlabs/d3mlabs/powershell@7.4.0
   ```
 
+- **`clang-format@18.1.8`** — Pinned standalone clang-format, so CI and every dev machine format identically. One ~4 MB binary (lifted from the [ssciwr clang-format wheel](https://github.com/ssciwr/clang-format-wheel), built from official LLVM in public CI), not all of LLVM. Linux x86_64 + macOS arm64/Intel.
+
+  ```bash
+  brew install d3mlabs/d3mlabs/clang-format@18.1.8
+  ```
+
 ## Contributing
 
 This tap is maintained by d3mlabs. Formulas point at tagged releases from their respective source repos.
