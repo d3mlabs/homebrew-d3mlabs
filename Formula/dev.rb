@@ -3,8 +3,8 @@
 class Dev < Formula
   desc "Find repo with dev.yml and run declared commands (d3mlabs convention)"
   homepage "https://github.com/d3mlabs/dev"
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.62.tar.gz"
-  sha256 "2e536028f8905b7a2ae2944d75b2ae40021d7d9aafe321c503f74d737a405683"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.63.tar.gz"
+  sha256 "d36274730349658035eaecf4d6ef69ffeedb5fdfab37dc2d325bf8e0984ba304"
 
   depends_on "rbenv"
   depends_on "ruby"
