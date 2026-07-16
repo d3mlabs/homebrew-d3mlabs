@@ -3,8 +3,8 @@
 class Dev < Formula
   desc "Find repo with dev.yml and run declared commands (d3mlabs convention)"
   homepage "https://github.com/d3mlabs/dev"
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.64.tar.gz"
-  sha256 "c3a8a6ad993ba63faa0e9460ceff49703f1459ac68cf21db582ba4079860513d"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.65.tar.gz"
+  sha256 "11f5b69c820aa7c6806577e6289f332d9519074f010bd64583e59035754e9095"
 
   depends_on "rbenv"
   depends_on "ruby"
@@ -42,6 +42,10 @@ class Dev < Formula
     end
 
     (libexec/"dev").install "bin", "src", "lib"
+    # share/ carries the ai-flow Cursor skill (symlinked into ~/.cursor/skills
+    # by `dev plan`); conditional so the formula still installs tarballs
+    # predating it.
+    (libexec/"dev").install "share" if File.directory?("share")
     (bin/"dev").write_env_script(libexec/"dev/bin/dev", GEM_HOME: libexec)
   end
 
