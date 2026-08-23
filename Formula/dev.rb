@@ -1,11 +1,19 @@
 # Global dev CLI: finds repo with dev.yml, runs commands with pretty CLI (Frame, in-process Ruby).
 # Install: brew tap d3mlabs/d3mlabs && brew install d3mlabs/d3mlabs/dev
+#
+# This formula is d3mlabs' DEPLOYMENT of the generic tool: dev's source is
+# org-blank, and the org identity enters here at the packaging layer — the
+# dependency set below plus the org config.yml installed into etc/dev/ (the
+# system layer of dev's settings). One command installs tool + identity.
+# See dev's README, "Org configuration & deployment".
 class Dev < Formula
   desc "Find repo with dev.yml and run declared commands (d3mlabs convention)"
   homepage "https://github.com/d3mlabs/dev"
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.79.tar.gz"
   sha256 "9793b1b0694baa2b380cccfa2fb5d7e90ef7179868d871999815dbcc392b03ee"
 
+  depends_on "gh"
+  depends_on "git"
   depends_on "rbenv"
   depends_on "ruby"
   depends_on "ruby-build"
@@ -47,6 +55,28 @@ class Dev < Formula
     # predating it.
     (libexec/"dev").install "share" if File.directory?("share")
     (bin/"dev").write_env_script(libexec/"dev/bin/dev", GEM_HOME: libexec)
+
+    # The d3mlabs org identity, into $(brew --prefix)/etc/dev/config.yml —
+    # the system layer of dev's layered settings (ENV > user file > this).
+    # etc files are brew-protected: a locally-modified copy survives
+    # upgrades untouched (the fresh one lands beside it as .default).
+    (buildpath/"config.yml").write <<~YAML
+      plans_repo: d3mlabs/plans
+      knowledge_repo: d3mlabs/knowledge
+      baseline_repo: d3mlabs/knowledge
+      default_org: d3mlabs
+    YAML
+    pkgetc.install "config.yml"
+  end
+
+  # No auto-converge in post_install: it would nest a brew invocation
+  # inside brew (deadlock-prone). The caveat prints on install and upgrade.
+  def caveats
+    <<~EOS
+      Run `dev up` to converge the d3mlabs host baseline (git, gh, rbenv,
+      shadowenv, the Cursor agent CLI). It works from any directory; inside
+      a project it also provisions that project.
+    EOS
   end
 
   test do
