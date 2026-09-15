@@ -38,6 +38,13 @@ class ClangFormatAT1818 < Formula
       url "https://files.pythonhosted.org/packages/05/a8/d94adc8025c6a313bed5da994c421fff7dc4288d20028b309b1d45e15032/clang_format-18.1.8-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", using: :nounzip
       sha256 "2de122b8aa78ba49e326f974131caab2c79f4ae877c227cd4e3e5d82a98d21e5"
     end
+    # arm64 Linux containers (Apple-silicon colima) evaluate this formula
+    # during `brew tap`'s syntax check; current Homebrew hard-fails a formula
+    # with no URL for the evaluated platform, poisoning the whole tap.
+    on_arm do
+      url "https://files.pythonhosted.org/packages/37/00/bd44b4d3e5d80560297d49ee7be0ed87260453a5115c6f613527f122a2e2/clang_format-18.1.8-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", using: :nounzip
+      sha256 "d2db077523bd4517b41fa6adb2e5ee63fc91bc7b641dc6e28b959fa8050cf41b"
+    end
   end
 
   def install
