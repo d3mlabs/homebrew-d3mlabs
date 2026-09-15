@@ -5,10 +5,12 @@ class PowershellAT740 < Formula
   homepage "https://github.com/PowerShell/PowerShell"
   version "7.4.0"
 
-  on_linux do
-    url "https://github.com/PowerShell/PowerShell/releases/download/v7.4.0/powershell_7.4.0-1.deb_amd64.deb"
-    sha256 "550331e243a7311e1bf0ca83d8c96c5e78ba82a765c4a9ba34aa0db6eb9a9f22"
-  end
+  # Top-level (not inside on_linux): current Homebrew evaluates every formula
+  # for every platform during `brew tap`'s syntax check and hard-fails one
+  # with no URL for the evaluated platform, poisoning the whole tap. The
+  # formula stays Linux-only in practice (macOS installs via the cask).
+  url "https://github.com/PowerShell/PowerShell/releases/download/v7.4.0/powershell_7.4.0-1.deb_amd64.deb"
+  sha256 "550331e243a7311e1bf0ca83d8c96c5e78ba82a765c4a9ba34aa0db6eb9a9f22"
 
   def install
     on_linux do
