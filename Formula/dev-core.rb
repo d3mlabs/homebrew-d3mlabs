@@ -16,19 +16,24 @@ class DevCore < Formula
   # All of these are the tool's own runtime dependencies, not org choices:
   # git/gh back clone, plan sync, and dependency fetchers; ruby runs the CLI
   # itself; rbenv/ruby-build/shadowenv power the built-in toolchain
-  # provisioning (every project command runs through `shadowenv exec`);
-  # colima + the docker CLI + its buildx plugin are the macOS container
-  # engine dev owns (`dev up` registers the plugin and starts the VM) — on
-  # Linux, dockerd is the distro's package and these are inert.
-  depends_on "colima"
-  depends_on "docker"
-  depends_on "docker-buildx"
+  # provisioning (every project command runs through `shadowenv exec`).
   depends_on "gh"
   depends_on "git"
   depends_on "rbenv"
   depends_on "ruby"
   depends_on "ruby-build"
   depends_on "shadowenv"
+
+  # The macOS container engine dev owns: colima is the VM, and the docker CLI
+  # + its buildx plugin replace the ones Docker Desktop bundled (`dev up`
+  # registers the plugin and starts the VM). On Linux / WSL2 the engine is
+  # the distro's dockerd + docker-ce-cli + docker-buildx-plugin, so these
+  # stay out of the way there.
+  on_macos do
+    depends_on "colima"
+    depends_on "docker"
+    depends_on "docker-buildx"
+  end
 
   # Runtime gems (dev.gemspec). Vendored as resources so they're fetched
   # before Homebrew's network-less build sandbox and installed offline — a
