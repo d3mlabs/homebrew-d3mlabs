@@ -16,8 +16,8 @@ class Dev < Formula
   # Same release tarball as dev-core: the deployment versions in lockstep
   # with the tool, and the tarball provides the keg payload (docs) brew
   # requires of every formula.
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.90.tar.gz"
-  sha256 "3441fa12ccb375eea40d0bfabbeac7d2d8c916b485aedc7e7a0da624ec82df67"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.91.tar.gz"
+  sha256 "8aa4542202d8193d1a00aee3dbe0622a8030912f2bf9c5704c0fc569b583d6c6"
 
   depends_on "d3mlabs/d3mlabs/dev-core"
 
