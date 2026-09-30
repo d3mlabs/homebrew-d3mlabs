@@ -13,10 +13,16 @@ class DevCore < Formula
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.90.tar.gz"
   sha256 "3441fa12ccb375eea40d0bfabbeac7d2d8c916b485aedc7e7a0da624ec82df67"
 
-  # All six are the tool's own runtime dependencies, not org choices: git/gh
-  # back clone, plan sync, and dependency fetchers; ruby runs the CLI itself;
-  # rbenv/ruby-build/shadowenv power the built-in toolchain provisioning
-  # (every project command runs through `shadowenv exec`).
+  # All of these are the tool's own runtime dependencies, not org choices:
+  # git/gh back clone, plan sync, and dependency fetchers; ruby runs the CLI
+  # itself; rbenv/ruby-build/shadowenv power the built-in toolchain
+  # provisioning (every project command runs through `shadowenv exec`);
+  # colima + the docker CLI + its buildx plugin are the macOS container
+  # engine dev owns (`dev up` registers the plugin and starts the VM) — on
+  # Linux, dockerd is the distro's package and these are inert.
+  depends_on "colima"
+  depends_on "docker"
+  depends_on "docker-buildx"
   depends_on "gh"
   depends_on "git"
   depends_on "rbenv"
