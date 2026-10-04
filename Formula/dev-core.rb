@@ -70,6 +70,10 @@ class DevCore < Formula
     # by `dev plan`); conditional so the formula still installs tarballs
     # predating it.
     (libexec/"dev").install "share" if File.directory?("share")
+    # VERSION is what `dev version` reads, and what a host dev compares
+    # against when it provisions dev-core into a build container at its own
+    # version (dev#218). Every release tarball carries it.
+    (libexec/"dev").install "VERSION"
     (bin/"dev").write_env_script(libexec/"dev/bin/dev", GEM_HOME: libexec)
   end
 
