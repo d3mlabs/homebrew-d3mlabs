@@ -74,7 +74,7 @@ jobs:
             fi
             names+=("$(basename "$f" .rb)")
           done
-          json=$(printf '%s\n' "${names[@]:-}" | grep -v '^$' | jq -R . | jq -cs .)
+          json=$(printf '%s\n' "${names[@]:-}" | jq -R . | jq -cs 'map(select(. != ""))')
           echo "formulae=$json" >> "$GITHUB_OUTPUT"
           echo "bottling: $json"
 
