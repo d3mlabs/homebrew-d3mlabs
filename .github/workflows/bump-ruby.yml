@@ -1,0 +1,63 @@
+# Grow the ruby@X.Y.Z family as homebrew/core moves its `ruby`: mint the
+# formula core currently ships (bin/mint-ruby-formula), open a PR, enable
+# auto-merge. The Bottle workflow bottles the PR; main's ruleset asks for one
+# approving review, so a human approves and the merge follows. Consumers then
+# move on `dev deps update` (dev#269 resolves `ruby "~> 4.0"` over the family).
+#
+# The PR is opened with the d3mlabs bot's token, not GITHUB_TOKEN, so that
+# the Bottle and CI workflows run on it. Dependency drift or a new minor exit
+# non-zero: those need a hand-minted formula (README "Conventions").
+name: Bump Ruby
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Mint a bot token
+        id: bot
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.D3MLABS_BOT_APP_ID }}
+          private-key: ${{ secrets.D3MLABS_BOT_PRIVATE_KEY }}
+
+      - name: Checkout tap
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot.outputs.token }}
+
+      - name: Mint the formula core ships
+        id: mint
+        run: bin/mint-ruby-formula
+
+      - name: Open the PR
+        if: steps.mint.outputs.version != ''
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          VERSION: ${{ steps.mint.outputs.version }}
+        run: |
+          set -euo pipefail
+          branch="ruby-$VERSION"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "branch $branch already exists; its PR is waiting for review"
+            exit 0
+          fi
+          git config user.name "d3mlabs-bot[bot]"
+          git config user.email "d3mlabs-bot[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add "Formula/ruby@$VERSION.rb"
+          git commit -m "ruby@$VERSION: new patch" \
+            -m "Minted by bin/mint-ruby-formula from the newest ruby@* of the same minor, with the tarball, rubygems and openssl homebrew/core ships for $VERSION."
+          git push origin "$branch"
+          pr_url=$(gh pr create --base main --head "$branch" \
+            --title "ruby@$VERSION: new patch" \
+            --body "Minted by the Bump Ruby workflow (\`bin/mint-ruby-formula\`). The Bottle workflow bottles it on this PR; approve once \`pour\` is green and auto-merge lands it. Consumers move on \`dev deps update\`.")
+          gh pr merge --auto --merge "$pr_url"
+          echo "opened $pr_url"

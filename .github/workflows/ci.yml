@@ -10,6 +10,16 @@ on:
   workflow_dispatch:
 
 jobs:
+  # bin/mint-ruby-formula and its library (the Bump Ruby workflow's engine).
+  test-mint-ruby-formula:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: ruby test/mint_ruby_formula_test.rb
+
   test-dev-formula:
     runs-on: macos-latest
 
