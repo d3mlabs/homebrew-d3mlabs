@@ -21,6 +21,12 @@ class RubyAT405 < Formula
     skip "immutable per-patch formula; a new patch is a new formula file"
   end
 
+  bottle do
+    root_url "https://github.com/d3mlabs/homebrew-d3mlabs/releases/download/ruby@4.0.5-4.0.5"
+    sha256 arm64_tahoe:  "786700738755c01961fa9100ca39f95cefa096c01ef97b7904786c3b802c41c6"
+    sha256 x86_64_linux: "e9e7786d67a3c108990cf164528065e4d4d56ef47e77786f65aed3ef8265eb23"
+  end
+
   keg_only :versioned_formula
 
   depends_on "pkgconf" => :build
