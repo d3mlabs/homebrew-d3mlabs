@@ -31,9 +31,11 @@ on:
 permissions:
   contents: write
 
+# Queue, never cancel: a run started on the bot's "add bottles" commit (a
+# re-run, or a later push) must not kill the `pour` verifying those bottles.
 concurrency:
   group: bottle-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   HOMEBREW_NO_INSTALL_CLEANUP: "1"
