@@ -73,13 +73,32 @@ jobs:
       - name: Run clang-format formula tests
         run: brew test d3mlabs/d3mlabs/clang-format@18.1.8
 
+  # The ruby@X.Y.Z family grows by itself (Bump Ruby), so the matrix is
+  # read from Formula/ rather than listed here.
+  list-ruby-formulae:
+    runs-on: ubuntu-24.04
+    outputs:
+      formulae: ${{ steps.list.outputs.formulae }}
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@v4
+
+      - name: List ruby@* formulae
+        id: list
+        run: |
+          set -euo pipefail
+          json=$(ls Formula/ruby@*.rb | xargs -n1 basename | sed 's/\.rb$//' | jq -R . | jq -cs .)
+          echo "formulae=$json" >> "$GITHUB_OUTPUT"
+          echo "$json"
+
   # Bottled formulae: audit, install (pours when the bottle block is
   # present, builds otherwise) and test on both bottled platforms.
   test-ruby-formulae:
+    needs: list-ruby-formulae
     strategy:
       fail-fast: false
       matrix:
-        formula: ["ruby@4.0.5", "ruby@4.0.6"]
+        formula: ${{ fromJSON(needs.list-ruby-formulae.outputs.formulae) }}
         os: [macos-26, ubuntu-24.04]
     runs-on: ${{ matrix.os }}
 

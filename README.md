@@ -36,10 +36,10 @@ brew tap d3mlabs/d3mlabs
   brew install d3mlabs/d3mlabs/clang-format@18.1.8
   ```
 
-- **`ruby@4.0.5`, `ruby@4.0.6`** — Ruby, one immutable formula per patch, bottled for arm64 macOS and x86_64 Linux. homebrew/core carries `ruby` only at its latest patch, so these are the versions a project can lock and keep. Keg-only: dev's `ruby` verb resolves a range (`ruby "~> 4.0"`) over this family, installs the locked patch and puts its keg on the project's PATH; brew never links them. A new Ruby patch is a new file, `Formula/ruby@X.Y.Z.rb`, derived from core's `ruby.rb` at the commit that shipped it — existing files are never edited.
+- **`ruby@X.Y.Z`** (one formula per Ruby patch; `ls Formula/ruby@*` for the current family) — Ruby, immutable per patch, bottled for arm64 macOS and x86_64 Linux. homebrew/core carries `ruby` only at its latest patch, so these are the versions a project can lock and keep. Keg-only: dev's `ruby` verb resolves a range (`ruby "~> 4.0"`) over this family, installs the locked patch and puts its keg on the project's PATH; brew never links them. A new Ruby patch is a new file, derived from core's `ruby.rb` at the commit that shipped it — existing files are never edited.
 
   ```bash
-  brew install d3mlabs/d3mlabs/ruby@4.0.6
+  brew install d3mlabs/d3mlabs/ruby@4.0.9
   ```
 
 ## What this tap admits
@@ -50,7 +50,7 @@ A formula is admitted when it is one of:
 
 1. **Software d3mlabs authors** — `dev`, `wwise-cli`. This is the tap's reason to exist.
 2. **A repackage under one of three triggers**, named in the formula's `desc` or a comment:
-   - **no binary channel exists** — Ruby (`ruby@4.0.5`, `ruby@4.0.6`): homebrew/core carries `ruby` only at its latest patch and `ruby@X.Y` only for retired minors, ruby-build compiles 2–3 minutes per host, and the prebuilt rubies that exist are not relocatable. Python is not here: core's `python@3.12` is the version a project locks, so it is consumed from core through dev's `python` verb ([dev#269](https://github.com/d3mlabs/dev/issues/269));
+   - **no binary channel exists** — Ruby (the `ruby@X.Y.Z` family): homebrew/core carries `ruby` only at its latest patch and `ruby@X.Y` only for retired minors, ruby-build compiles 2–3 minutes per host, and the prebuilt rubies that exist are not relocatable. Python is not here: core's `python@3.12` is the version a project locks, so it is consumed from core through dev's `python` verb ([dev#269](https://github.com/d3mlabs/dev/issues/269));
    - **a channel exists but fails dev's admission test** (immutable versions, verifiable integrity, no root, per-host probe) — Wine via apt ([#5](https://github.com/d3mlabs/homebrew-d3mlabs/issues/5));
    - **we change the bytes** — patches, relocation.
    Brew is the right own-channel when the package has transitive runtime dependencies to declare (`depends_on` installs the closure a bare tree cannot). A self-contained tree, something large, or something licensed goes to a GitHub release in a repo we own and is consumed with dev's `gh` verb instead.
