@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Mints Formula/ruby@X.Y.Z.rb for the Ruby homebrew/core currently ships, if
+# this tap does not have it yet. Prints the new formula's path, or nothing
+# when the tap is up to date. With GITHUB_OUTPUT set, also writes
+# `version=X.Y.Z` (empty when nothing was minted) for the bump-ruby workflow.
+#
+# Exits non-zero on DependencyDrift or NoTemplate: those are for a human.
+
+require "json"
+require "net/http"
+require "uri"
+require_relative "../lib/mint_ruby_formula"
+
+CORE_API = URI("https://formulae.brew.sh/api/formula/ruby.json")
+FORMULA_DIR = File.expand_path("../Formula", __dir__)
+
+def fetch(uri)
+  response = Net::HTTP.get_response(uri)
+  raise "GET #{uri} failed: #{response.code} #{response.message}" unless response.is_a?(Net::HTTPSuccess)
+
+  response.body
+end
+
+core = JSON.parse(fetch(CORE_API))
+core_commit = core.fetch("tap_git_head")
+formula_rb = fetch(URI("https://raw.githubusercontent.com/Homebrew/homebrew-core/#{core_commit}/Formula/r/ruby.rb"))
+release = MintRubyFormula::Release.from_core(formula_rb: formula_rb, core_commit: core_commit)
+
+path = MintRubyFormula.mint(release: release, formula_dir: FORMULA_DIR)
+puts path if path
+File.write(ENV["GITHUB_OUTPUT"], "version=#{path ? release.version : ""}\n", mode: "a") if ENV["GITHUB_OUTPUT"]
