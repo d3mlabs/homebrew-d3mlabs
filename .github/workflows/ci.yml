@@ -59,3 +59,31 @@ jobs:
 
       - name: Run clang-format formula tests
         run: brew test d3mlabs/d3mlabs/clang-format@18.1.8
+
+  # Bottled formulae: audit, install (pours when the bottle block is
+  # present, builds otherwise) and test on both bottled platforms.
+  test-ruby-formulae:
+    strategy:
+      fail-fast: false
+      matrix:
+        formula: ["ruby@4.0.5", "ruby@4.0.6"]
+        os: [macos-26, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+
+    env:
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+      HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: "1"
+
+    steps:
+      # Checks out this repo and symlinks it in as the d3mlabs/d3mlabs tap.
+      - name: Set up Homebrew with this tap
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Audit formula
+        run: brew audit --strict "d3mlabs/d3mlabs/${{ matrix.formula }}"
+
+      - name: Install from tap
+        run: brew install "d3mlabs/d3mlabs/${{ matrix.formula }}"
+
+      - name: Run formula tests
+        run: brew test "d3mlabs/d3mlabs/${{ matrix.formula }}"

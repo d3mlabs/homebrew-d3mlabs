@@ -1,0 +1,208 @@
+# Bottle the formulae a PR adds or changes, for arm64 macOS (tahoe) and
+# x86_64 Linux. See README "Conventions for what is admitted".
+#
+# Flow: `detect` lists the PR's Formula/*.rb files that have no `bottle do`
+# block yet; `build` compiles each on both runners and uploads the tarballs
+# and bottle JSON as artifacts; `publish` merges the JSON into the formula,
+# uploads the tarballs to a GitHub release named `<formula>-<version>` (the
+# formula's `root_url`), and pushes the bottle block to the PR branch;
+# `pour` installs from that branch on both runners and asserts brew poured
+# rather than built.
+#
+# The push uses GITHUB_TOKEN, so it does not re-trigger workflows. To
+# re-bottle during a PR, delete the formula's `bottle do` block and push.
+#
+# setup-homebrew replaces the workspace with its own checkout of GITHUB_SHA
+# and symlinks it in as the d3mlabs/d3mlabs tap; jobs that need the PR
+# branch run actions/checkout after it, into the same (symlinked) path.
+name: Bottle
+
+on:
+  pull_request:
+    paths:
+      - "Formula/*.rb"
+  workflow_dispatch:
+    inputs:
+      formula:
+        description: "Formula to bottle (e.g. ruby@4.0.6); its branch is the one dispatched"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bottle-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: "1"
+  BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+jobs:
+  detect:
+    runs-on: ubuntu-24.04
+    outputs:
+      formulae: ${{ steps.detect.outputs.formulae }}
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Formulae to bottle
+        id: detect
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_FORMULA: ${{ inputs.formula }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            files="Formula/${INPUT_FORMULA}.rb"
+            [ -f "$files" ] || { echo "::error::no $files"; exit 1; }
+          else
+            files=$(git diff --name-only --diff-filter=AM "$BASE_SHA...HEAD" -- 'Formula/*.rb')
+          fi
+          names=()
+          for f in $files; do
+            if grep -q '^  bottle do' "$f"; then
+              echo "skip $f: already has a bottle block"
+              continue
+            fi
+            names+=("$(basename "$f" .rb)")
+          done
+          json=$(printf '%s\n' "${names[@]:-}" | grep -v '^$' | jq -R . | jq -cs .)
+          echo "formulae=$json" >> "$GITHUB_OUTPUT"
+          echo "bottling: $json"
+
+  build:
+    needs: detect
+    if: needs.detect.outputs.formulae != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        formula: ${{ fromJSON(needs.detect.outputs.formulae) }}
+        os: [macos-26, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Set up Homebrew with this tap
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Build for bottling
+        run: brew install --build-bottle "d3mlabs/d3mlabs/${{ matrix.formula }}"
+
+      - name: Test the build
+        run: brew test "d3mlabs/d3mlabs/${{ matrix.formula }}"
+
+      - name: Bottle
+        env:
+          FORMULA: ${{ matrix.formula }}
+        run: |
+          set -euo pipefail
+          mkdir bottles && cd bottles
+          pkg_version=$(brew ruby -e "puts Formula['d3mlabs/d3mlabs/$FORMULA'].pkg_version")
+          brew bottle --json --no-rebuild \
+            --root-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${FORMULA}-${pkg_version}" \
+            "d3mlabs/d3mlabs/$FORMULA"
+          ls -la
+
+      - name: Upload bottle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottle-${{ matrix.formula }}-${{ matrix.os }}
+          path: bottles/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [detect, build]
+    runs-on: ubuntu-24.04
+    strategy:
+      max-parallel: 1
+      matrix:
+        formula: ${{ fromJSON(needs.detect.outputs.formulae) }}
+    steps:
+      - name: Set up Homebrew with this tap
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Checkout the PR branch into the tap
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
+
+      - name: Download bottle artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bottle-${{ matrix.formula }}-*
+          path: bottles
+          merge-multiple: true
+
+      - name: Write the bottle block
+        run: |
+          set -euo pipefail
+          cd bottles
+          brew bottle --merge --write --no-commit ./*.bottle.json
+          git -C "$GITHUB_WORKSPACE" --no-pager diff -- Formula
+
+      # brew bottle writes `name--version.tag.bottle.tar.gz` locally; the URL
+      # it fetches later is `root_url/name-version.tag.bottle.tar.gz`.
+      - name: Upload bottles to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FORMULA: ${{ matrix.formula }}
+        run: |
+          set -euo pipefail
+          cd bottles
+          for f in *--*.bottle.tar.gz; do mv "$f" "${f/--/-}"; done
+          root_url=$(jq -r 'to_entries[0].value.bottle.root_url' ./*.bottle.json | head -1)
+          tag="${root_url##*/}"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --title "$tag bottles" \
+              --notes "Bottles for \`$FORMULA\`, built by the Bottle workflow from $(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)." \
+              --target "$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)"
+          fi
+          gh release upload "$tag" --clobber ./*.bottle.tar.gz
+
+      - name: Push the bottle block to the PR branch
+        env:
+          FORMULA: ${{ matrix.formula }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula
+          git commit -m "$FORMULA: add bottles" -m "arm64_tahoe and x86_64_linux, built by the Bottle workflow."
+          git push origin "HEAD:refs/heads/$BRANCH"
+
+  pour:
+    needs: [detect, publish]
+    strategy:
+      fail-fast: false
+      matrix:
+        formula: ${{ fromJSON(needs.detect.outputs.formulae) }}
+        os: [macos-26, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Set up Homebrew with this tap
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Checkout the bottled PR branch into the tap
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
+
+      - name: Install from bottle
+        run: brew install "d3mlabs/d3mlabs/${{ matrix.formula }}"
+
+      - name: Assert poured, not built
+        run: |
+          set -euo pipefail
+          poured=$(brew info --json=v2 "d3mlabs/d3mlabs/${{ matrix.formula }}" | jq -r '.formulae[0].installed[0].poured_from_bottle')
+          echo "poured_from_bottle=$poured"
+          [ "$poured" = "true" ]
+
+      - name: Test the poured keg
+        run: brew test "d3mlabs/d3mlabs/${{ matrix.formula }}"
