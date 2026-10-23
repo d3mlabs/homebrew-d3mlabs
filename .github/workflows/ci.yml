@@ -77,7 +77,7 @@ jobs:
     steps:
       # Checks out this repo and symlinks it in as the d3mlabs/d3mlabs tap.
       - name: Set up Homebrew with this tap
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
 
       - name: Audit formula
         run: brew audit --strict "d3mlabs/d3mlabs/${{ matrix.formula }}"

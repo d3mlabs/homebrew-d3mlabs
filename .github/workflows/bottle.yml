@@ -89,7 +89,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Set up Homebrew with this tap
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
 
       - name: Build for bottling
         run: brew install --build-bottle "d3mlabs/d3mlabs/${{ matrix.formula }}"
@@ -126,7 +126,7 @@ jobs:
         formula: ${{ fromJSON(needs.detect.outputs.formulae) }}
     steps:
       - name: Set up Homebrew with this tap
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
 
       - name: Checkout the PR branch into the tap
         uses: actions/checkout@v4
@@ -187,7 +187,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Set up Homebrew with this tap
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
 
       - name: Checkout the bottled PR branch into the tap
         uses: actions/checkout@v4
