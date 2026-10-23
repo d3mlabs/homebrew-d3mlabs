@@ -1,7 +1,6 @@
 # Grow the ruby@X.Y.Z family as homebrew/core moves its `ruby`: mint the
-# formula core currently ships (bin/mint-ruby-formula), open a PR, enable
-# auto-merge. The Bottle workflow bottles the PR; main's ruleset asks for one
-# approving review, so a human approves and the merge follows. Consumers then
+# formula core currently ships (bin/mint-ruby-formula) and open a PR. The
+# Bottle workflow bottles the PR; a human reviews and merges. Consumers then
 # move on `dev deps update` (dev#269 resolves `ruby "~> 4.0"` over the family).
 #
 # The PR is opened with the d3mlabs bot's token, not GITHUB_TOKEN, so that
@@ -56,8 +55,6 @@ jobs:
           git commit -m "ruby@$VERSION: new patch" \
             -m "Minted by bin/mint-ruby-formula from the newest ruby@* of the same minor, with the tarball, rubygems and openssl homebrew/core ships for $VERSION."
           git push origin "$branch"
-          pr_url=$(gh pr create --base main --head "$branch" \
+          gh pr create --base main --head "$branch" \
             --title "ruby@$VERSION: new patch" \
-            --body "Minted by the Bump Ruby workflow (\`bin/mint-ruby-formula\`). The Bottle workflow bottles it on this PR; approve once \`pour\` is green and auto-merge lands it. Consumers move on \`dev deps update\`.")
-          gh pr merge --auto --merge "$pr_url"
-          echo "opened $pr_url"
+            --body "Minted by the Bump Ruby workflow (\`bin/mint-ruby-formula\`). The Bottle workflow bottles it on this PR; merge once \`pour\` is green. Consumers move on \`dev deps update\`."
