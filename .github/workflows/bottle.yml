@@ -74,6 +74,14 @@ jobs:
               echo "skip $f: already has a bottle block"
               continue
             fi
+            # dev and dev-core are released by dev's bin/release.rb, which bumps
+            # url + sha256 straight on main; a PR-time bottle of them is of a
+            # version about to move, and its root_url would point at a stale
+            # release. Pure Ruby + vendored gems, they lose nothing unbottled.
+            case "$(basename "$f" .rb)" in dev|dev-core)
+              echo "skip $f: released by dev's release.rb, never bottled"
+              continue ;;
+            esac
             names+=("$(basename "$f" .rb)")
           done
           json=$(printf '%s\n' "${names[@]:-}" | jq -R . | jq -cs 'map(select(. != ""))')

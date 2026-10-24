@@ -15,13 +15,13 @@ class DevCore < Formula
 
   # All of these are the tool's own runtime dependencies, not org choices:
   # git/gh back clone, plan sync, and dependency fetchers; ruby runs the CLI
-  # itself; rbenv/ruby-build/shadowenv power the built-in toolchain
-  # provisioning (every project command runs through `shadowenv exec`).
+  # itself (the bin/dev trampoline); shadowenv applies each project's
+  # environment (every project command runs through `shadowenv exec`). A
+  # project's own Ruby is a `ruby@X.Y.Z` pin from this tap that dev installs
+  # as a dependency (dev ADR-0012), so no rbenv/ruby-build here.
   depends_on "gh"
   depends_on "git"
-  depends_on "rbenv"
   depends_on "ruby"
-  depends_on "ruby-build"
   depends_on "shadowenv"
 
   # The macOS container engine dev owns: colima is the VM, and the docker CLI
@@ -87,7 +87,9 @@ class DevCore < Formula
   end
 
   test do
-    output = shell_output("#{bin}/dev 2>&1", 1)
-    assert_match(/no dev\.yml/, output)
+    # Outside a project dev is still a working CLI: `version` answers, and
+    # the bare invocation lists the commands available there (exit 0).
+    assert_match version.to_s, shell_output("#{bin}/dev version")
+    assert_match "outside a project", shell_output("#{bin}/dev 2>&1")
   end
 end
