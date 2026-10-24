@@ -87,7 +87,9 @@ class DevCore < Formula
   end
 
   test do
-    output = shell_output("#{bin}/dev 2>&1", 1)
-    assert_match(/no dev\.yml/, output)
+    # Outside a project dev is still a working CLI: `version` answers, and
+    # the bare invocation lists the commands available there (exit 0).
+    assert_match version.to_s, shell_output("#{bin}/dev version")
+    assert_match "outside a project", shell_output("#{bin}/dev 2>&1")
   end
 end
