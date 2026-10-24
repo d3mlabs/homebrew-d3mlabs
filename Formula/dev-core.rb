@@ -13,6 +13,12 @@ class DevCore < Formula
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.2.113.tar.gz"
   sha256 "03e48651b57f7abf7857c72c3de9def9d4883c218edacac975d11f8c15cd3617"
 
+  bottle do
+    root_url "https://github.com/d3mlabs/homebrew-d3mlabs/releases/download/dev-core-0.2.113"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:  "cc11b238bc482bdb4f76682c69fae3661bae281a582d9b68b825d118e2bcd5a1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "0528ece2f0fe5776f1cebe74c29284a54a7a78a2c87baeffba6e33924ddff902"
+  end
+
   # All of these are the tool's own runtime dependencies, not org choices:
   # git/gh back clone, plan sync, and dependency fetchers; ruby runs the CLI
   # itself (the bin/dev trampoline); shadowenv applies each project's
