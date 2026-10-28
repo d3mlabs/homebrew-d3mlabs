@@ -50,10 +50,12 @@ class DevCore < Formula
   end
 
   def install
-    # Vendor runtime gems into libexec. GEM_HOME/GEM_PATH point there so the
-    # wrapper (run with GEM_HOME=libexec) resolves them under any >= 3.1 ruby
-    # (rbenv, shadowenv-pinned, or Homebrew), independent of the build
-    # machine's gems.
+    # Vendor runtime gems into libexec, independent of the build machine's
+    # gems. GEM_HOME/GEM_PATH are install-time only: at run time bin/dev
+    # finds `libexec/specifications` beside itself and selects these gems
+    # in-process (Gem.use_paths), so the installed command exports nothing —
+    # a wrapper's GEM_HOME leaked into every child dev spawned (dev#180,
+    # dev#274, dev#333).
     ENV["GEM_HOME"] = libexec
     ENV["GEM_PATH"] = libexec
 
@@ -74,7 +76,7 @@ class DevCore < Formula
     # against when it provisions dev-core into a build container at its own
     # version (dev#218). Every release tarball carries it.
     (libexec/"dev").install "VERSION"
-    (bin/"dev").write_env_script(libexec/"dev/bin/dev", GEM_HOME: libexec)
+    bin.install_symlink libexec/"dev/bin/dev"
   end
 
   def caveats
