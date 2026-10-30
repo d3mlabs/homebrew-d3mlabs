@@ -18,24 +18,6 @@ brew tap d3mlabs/d3mlabs
 
   See [d3mlabs/dev](https://github.com/d3mlabs/dev) for usage and the `dev.yml` convention.
 
-- **`axslcc`** — Axmol shader compiler (used by Cellbound and other axmol-based projects).
-
-  ```bash
-  brew install d3mlabs/d3mlabs/axslcc
-  ```
-
-- **`powershell@7.4.0`** — PowerShell (pwsh) 7.4.0 for Linux. macOS users typically install the cask instead.
-
-  ```bash
-  brew install d3mlabs/d3mlabs/powershell@7.4.0
-  ```
-
-- **`clang-format@18.1.8`** — Pinned standalone clang-format, so CI and every dev machine format identically. One ~4 MB binary (lifted from the [ssciwr clang-format wheel](https://github.com/ssciwr/clang-format-wheel), built from official LLVM in public CI), not all of LLVM. Linux x86_64 + macOS arm64/Intel.
-
-  ```bash
-  brew install d3mlabs/d3mlabs/clang-format@18.1.8
-  ```
-
 - **`ruby@X.Y.Z`** (one formula per Ruby patch; `ls Formula/ruby@*` for the current family) — Ruby, immutable per patch, bottled for arm64 macOS and x86_64 Linux. homebrew/core carries `ruby` only at its latest patch, so these are the versions a project can lock and keep. Keg-only: dev's `ruby` verb resolves a range (`ruby "~> 4.0"`) over this family, installs the locked patch and puts its keg on the project's PATH; brew never links them. A new Ruby patch is a new file, derived from core's `ruby.rb` at the commit that shipped it — existing files are never edited.
 
   ```bash
@@ -54,12 +36,12 @@ A formula is admitted when it is one of:
    - **a channel exists but fails dev's admission test** (immutable versions, verifiable integrity, no root, per-host probe) — Wine via apt ([#5](https://github.com/d3mlabs/homebrew-d3mlabs/issues/5));
    - **we change the bytes** — patches, relocation.
    Brew is the right own-channel when the package has transitive runtime dependencies to declare (`depends_on` installs the closure a bare tree cannot). A self-contained tree, something large, or something licensed goes to a GitHub release in a repo we own and is consumed with dev's `gh` verb instead.
-3. **A thin lift as a stopgap** — re-hosting an artifact a channel dev supports already carries, without changing the bytes, because the consuming project cannot yet reach that channel. A thin lift names its retirement condition. The three in the tap today — `clang-format@18.1.8` (a PyPI wheel), `powershell@7.4.0` (a GitHub release `.deb`), `axslcc` (GitHub release tarballs) — were right when written and retire under [#6](https://github.com/d3mlabs/homebrew-d3mlabs/issues/6) once dev puts `gh` trees on PATH.
+3. **A thin lift as a stopgap** — re-hosting an artifact a channel dev supports already carries, without changing the bytes, because the consuming project cannot yet reach that channel. A thin lift names its retirement condition. The precedent, retired under [#6](https://github.com/d3mlabs/homebrew-d3mlabs/issues/6) (2026-10-29): `clang-format@18.1.8` lifted the ssciwr PyPI wheel until dev's `pip` verb put the same wheel in a project venv on PATH (snappy#133); `powershell@7.4.0` (a GitHub release `.deb`) and `axslcc` (GitHub release tarballs) lifted what dev's `gh` verb now fetches, and their one consumer was a retired project. A new thin lift is admitted the same way: with the channel it waits for and the condition that deletes it.
 
 Conventions for what is admitted:
 
-- **Bottled for arm64 macOS and x86_64 Linux.** The [Bottle workflow](.github/workflows/bottle.yml) runs on every PR that adds or changes a formula without a `bottle do` block: it builds on `macos-26` and `ubuntu-24.04`, uploads the tarballs to a GitHub release named `<formula>-<version>` (the formula's `root_url`), pushes the bottle block to the PR branch, then installs from it on both platforms and asserts brew poured. To re-bottle during a PR, delete the bottle block and push. `dev` and `dev-core` are never bottled: dev's `bin/release.rb` bumps them straight on main, so a PR-time bottle would be of a version about to move (pure Ruby + vendored gems, nothing is lost). Formulae that predate the workflow (`axslcc`, the thin lifts) still build from source; dev's lock records `format: source` for all of these.
-- **`name@exact`** (`ruby@4.0.6`, `clang-format@18.1.8`) when two projects on one machine plausibly lock different versions; a plain `name` otherwise. dev activates the locked keg per project regardless of which keg brew linked, so the suffix is about brew's view, not dev's. For a runtime consumers lock by range, the family of `name@exact` formulae is the universe the range resolves over, and a new version is a new file — never an edit to an existing one.
+- **Bottled for arm64 macOS and x86_64 Linux.** The [Bottle workflow](.github/workflows/bottle.yml) runs on every PR that adds or changes a formula without a `bottle do` block: it builds on `macos-26` and `ubuntu-24.04`, uploads the tarballs to a GitHub release named `<formula>-<version>` (the formula's `root_url`), pushes the bottle block to the PR branch, then installs from it on both platforms and asserts brew poured. To re-bottle during a PR, delete the bottle block and push. `dev` and `dev-core` are never bottled: dev's `bin/release.rb` bumps them straight on main, so a PR-time bottle would be of a version about to move (pure Ruby + vendored gems, nothing is lost). `wwise-cli` predates the workflow and still builds from source; dev's lock records `format: source` for it.
+- **`name@exact`** (`ruby@4.0.6`) when two projects on one machine plausibly lock different versions; a plain `name` otherwise. dev activates the locked keg per project regardless of which keg brew linked, so the suffix is about brew's view, not dev's. For a runtime consumers lock by range, the family of `name@exact` formulae is the universe the range resolves over, and a new version is a new file — never an edit to an existing one.
 - **A bump is two steps**: the formula bump here, then `dev deps update` in each consumer, which moves its `tap_commit` pin (dev's ADR-0005).
 - **Ruby patches arrive on their own.** The [Bump Ruby workflow](.github/workflows/bump-ruby.yml) runs daily: when homebrew/core's `ruby` is a patch this tap lacks, [`bin/mint-ruby-formula`](bin/mint-ruby-formula) writes `Formula/ruby@X.Y.Z.rb` from the newest formula of the same minor — re-pointed at core's tarball, rubygems resource and openssl major — and opens a PR. The Bottle workflow bottles it; a human reviews and merges. The script refuses two things a human must do by hand: a dependency core added or dropped (other than the openssl major), and a new minor with no `ruby@X.Y.*.rb` to template from. Tests: `ruby test/mint_ruby_formula_test.rb`.
 
