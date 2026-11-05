@@ -10,8 +10,8 @@
 class DevCore < Formula
   desc "Find repo with dev.yml and run declared commands"
   homepage "https://github.com/d3mlabs/dev"
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.7.3.tar.gz"
-  sha256 "6a7866c0157cf2881336b203f564ad3ab9229ea51ac9b6a8d69f5120ba15a9b8"
+  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.7.4.tar.gz"
+  sha256 "20d8275405407e92a5222b67861e1464991abf73107d854100561e87afca0501"
 
   # All of these are the tool's own runtime dependencies, not org choices:
   # git/gh back clone, plan sync, and dependency fetchers; ruby runs the CLI
