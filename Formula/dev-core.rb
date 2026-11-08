@@ -10,6 +10,10 @@
 class DevCore < Formula
   desc "Find repo with dev.yml and run declared commands"
   homepage "https://github.com/d3mlabs/dev"
+  # The `dev-core` archive of dev's own GitHub release (dev#429): the tool
+  # as laid out by dev's bin/install-core (bin, src, lib, share, VERSION,
+  # LICENSE, README.md) and packaged by `dev release`. `dev deploy brew`
+  # rewrites this url/sha256 pair on each release.
   url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.7.13.tar.gz"
   sha256 "6e1217f48a323da2e4dd1fac4c7e7d761aa60b39b0e4f2afb784459d5fc1f493"
 
