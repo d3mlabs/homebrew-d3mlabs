@@ -13,37 +13,29 @@
 class Dev < Formula
   desc "D3mlabs deployment of the dev CLI (tool plus org configuration)"
   homepage "https://github.com/d3mlabs/dev"
-  # Same release tarball as dev-core: the deployment versions in lockstep
-  # with the tool, and the tarball provides the keg payload (docs) brew
-  # requires of every formula.
-  url "https://github.com/d3mlabs/dev/archive/refs/tags/v0.7.13.tar.gz"
-  sha256 "6e1217f48a323da2e4dd1fac4c7e7d761aa60b39b0e4f2afb784459d5fc1f493"
+  # The `dev` archive of dev's own GitHub release (dev#429): the org
+  # payload, built by dev's bin/install-deployment and packaged by
+  # `dev release`. `dev deploy brew` rewrites this url/sha256 pair on each
+  # release; the deployment versions in lockstep with dev-core.
+  url "https://github.com/d3mlabs/dev/releases/download/v0.8.0/dev-0.8.0.zip"
+  sha256 "ac9d440fbec97720430c5eaa12098e6ab62dc1f0b98451d1f5d81940057a875f"
 
   depends_on "d3mlabs/d3mlabs/dev-core"
 
   def install
-    doc.install "README.md"
+    # The keg payload: pkgetc lands outside the keg, and brew refuses an
+    # empty one — so the archive carries the docs too (dev#517).
+    doc.install "README.md", "LICENSE"
 
-    # The d3mlabs org identity, into $(brew --prefix)/etc/dev/config.yml —
-    # the system layer of dev's layered settings (ENV > user file > this).
+    # The d3mlabs org identity (dev's deploy/d3mlabs/), into
+    # $(brew --prefix)/etc/dev/: config.yml is the system layer of dev's
+    # layered settings (ENV > user file > this) — its deployment_formula
+    # names this formula, which is how `dev up` knows what to
+    # self-upgrade; the Brewfile is the org's host tooling beyond
+    # dev-core's own dependencies, converged by `dev up` via brew bundle.
     # etc files are brew-protected: a locally-modified copy survives
     # upgrades untouched (the fresh one lands beside it as .default).
-    # deployment_formula is this formula's own name: it is how `dev up`
-    # knows which formula to self-upgrade (the deployment names itself).
-    (buildpath/"config.yml").write <<~YAML
-      plans_repo: d3mlabs/plans
-      knowledge_repo: d3mlabs/knowledge
-      deployment_formula: d3mlabs/d3mlabs/dev
-      default_org: d3mlabs
-    YAML
-    pkgetc.install "config.yml"
-
-    # The org's host tooling beyond dev-core's own dependencies (the sets
-    # are disjoint by design). `dev up` converges it via brew bundle.
-    (buildpath/"Brewfile").write <<~BREWFILE
-      cask "cursor-cli"
-    BREWFILE
-    pkgetc.install "Brewfile"
+    pkgetc.install "config.yml", "Brewfile"
   end
 
   # No auto-converge in post_install: it would nest a brew invocation
