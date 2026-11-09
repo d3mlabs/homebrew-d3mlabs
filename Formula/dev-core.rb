@@ -11,7 +11,7 @@ class DevCore < Formula
   desc "Find repo with dev.yml and run declared commands"
   homepage "https://github.com/d3mlabs/dev"
   # The `dev-core` archive of dev's own GitHub release (dev#429): the tool
-  # as laid out by dev's bin/install-core (bin, src, lib, share, VERSION,
+  # as laid out by dev's bin/install-core (bin, lib, share, VERSION,
   # LICENSE, README.md) and packaged by `dev release`. `dev deploy brew`
   # rewrites this url/sha256 pair on each release.
   url "https://github.com/d3mlabs/dev/releases/download/v0.8.3/dev-core-0.8.3.zip"
@@ -71,7 +71,11 @@ class DevCore < Formula
              "--no-document", "--ignore-dependencies", "--install-dir", libexec
     end
 
-    (libexec/"dev").install "bin", "src", "lib"
+    (libexec/"dev").install "bin", "lib"
+    # Through 0.8.3 the tool had a second Ruby root, src/ (the CLI shell);
+    # dev#537 folded it into lib/dev/cli. Conditional so the formula still
+    # installs those tarballs.
+    (libexec/"dev").install "src" if File.directory?("src")
     # share/ carries the ai-flow Cursor skill (symlinked into ~/.cursor/skills
     # by `dev plan`); conditional so the formula still installs tarballs
     # predating it.
