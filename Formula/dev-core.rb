@@ -28,6 +28,12 @@ class DevCore < Formula
   depends_on "ruby"
   depends_on "shadowenv"
 
+  # dev spawns `zip` and `unzip` at run time (lifecycle/archive.rb and
+  # unpacker.rb, deps/egs_integration.rb, deps/multi_target_plugin_merger.rb).
+  # macOS ships both in the base system; Ubuntu's minimal install does not.
+  uses_from_macos "unzip"
+  uses_from_macos "zip"
+
   # The macOS container engine dev owns: colima is the VM, and the docker CLI
   # + its buildx plugin replace the ones Docker Desktop bundled (`dev up`
   # registers the plugin and starts the VM). On Linux / WSL2 the engine is
