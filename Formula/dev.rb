@@ -17,8 +17,8 @@ class Dev < Formula
   # payload, built by dev's bin/install-deployment and packaged by
   # `dev release`. `dev deploy brew` rewrites this url/sha256 pair on each
   # release; the deployment versions in lockstep with dev-core.
-  url "https://github.com/d3mlabs/dev/releases/download/v0.8.8/dev-0.8.8.zip"
-  sha256 "d79e896b7381d1340d4e9aad57b551c4d5f0c1370e1738c6734da6a59d455a1b"
+  url "https://github.com/d3mlabs/dev/releases/download/v0.8.9/dev-0.8.9.zip"
+  sha256 "1dce57b879bc4d981ffc6305fbafd6ea54e629d500fa1812e61c8ed91d78c9a4"
 
   depends_on "d3mlabs/d3mlabs/dev-core"
 
