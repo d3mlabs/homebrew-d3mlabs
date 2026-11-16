@@ -14,8 +14,8 @@ class DevCore < Formula
   # as laid out by dev's bin/install-core (bin, lib, share, VERSION,
   # LICENSE, README.md) and packaged by `dev release`. `dev deploy brew`
   # rewrites this url/sha256 pair on each release.
-  url "https://github.com/d3mlabs/dev/releases/download/v0.8.9/dev-core-0.8.9.zip"
-  sha256 "0659f59568ed6807358ebf5d976f77fd419e3440bac155b4abfd2bbb5182f417"
+  url "https://github.com/d3mlabs/dev/releases/download/v0.8.10/dev-core-0.8.10.zip"
+  sha256 "1155a18c63488ff6262dacdaeaf02f95315e53bb3b23ec02fcecedb7b9b15411"
 
   # All of these are the tool's own runtime dependencies, not org choices:
   # git/gh back clone, plan sync, and dependency fetchers; ruby runs the CLI
