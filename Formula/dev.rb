@@ -27,7 +27,8 @@ class Dev < Formula
     # empty one — so the archive carries the docs too (dev#517).
     doc.install "README.md", "LICENSE"
 
-    # The d3mlabs org identity (dev's deploy/d3mlabs/), into
+    # The d3mlabs org identity, at its checkout paths in the archive
+    # (dev's deploy/d3mlabs/, since dev 0.9.4), into
     # $(brew --prefix)/etc/dev/: config.yml is the system layer of dev's
     # layered settings (ENV > user file > this) — its deployment_formula
     # names this formula, which is how `dev up` knows what to
@@ -35,7 +36,7 @@ class Dev < Formula
     # dev-core's own dependencies, converged by `dev up` via brew bundle.
     # etc files are brew-protected: a locally-modified copy survives
     # upgrades untouched (the fresh one lands beside it as .default).
-    pkgetc.install "config.yml", "Brewfile"
+    pkgetc.install "deploy/d3mlabs/config.yml", "deploy/d3mlabs/Brewfile"
   end
 
   # No auto-converge in post_install: it would nest a brew invocation
