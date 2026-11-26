@@ -9,3 +9,6 @@
 
 # Logs
 *.log
+
+# Activation lisps dev writes for the project environment.
+.shadowenv.d/

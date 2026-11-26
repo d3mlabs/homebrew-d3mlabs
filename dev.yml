@@ -1,0 +1,4 @@
+name: homebrew-d3mlabs
+# A dev project for one reason: the ai-commands job runs `dev up` in this
+# checkout, which installs the ai-flow dispatcher dependencies.rb declares
+# and puts it on the project PATH. The tap's own CI is brew's, not dev's.

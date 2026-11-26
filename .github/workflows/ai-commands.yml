@@ -1,0 +1,47 @@
+# ai-flow caller workflow — copy to .github/workflows/ai-commands.yml in each
+# participating repo (code repos and the org plans repo); `ai-flow adopt`
+# writes it. Requires:
+# - ai-flow installed on the repo's hosts as a dependency of the repo's own
+#   (a 1.x release; see the README's adoption checklist): the job's
+#   `dev up` installs it like every other tool the repo declares
+# - the org-level CURSOR_API_KEY secret (or a repo secret)
+# - the org-level AI_FLOW_APP_ID / AI_FLOW_APP_PRIVATE_KEY secrets (the
+#   ai-flow GitHub App — required; jobs fail without them unless you opt
+#   into degraded mode with `with: { allow_token_fallback: true }`)
+# - this repo in each org secret's selected-repos list (our org secrets use
+#   `selected` visibility; see the README's adoption checklist, step 2)
+# - self-hosted runners labeled per command: ai-ask / ai-edit / ai-split /
+#   ai-build / ai-learn (one box can carry all five labels; see the
+#   d3mlabs/ai-flow README)
+#
+# Optional: model policy lives in .github/ai-flow.yml (see
+# templates/ai-flow.yml), not here — workflow inputs are scalar-only.
+name: ai-commands
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  # Review summaries: a command in the review's summary text dispatches too
+  # (submitted only — edits and dismissals never re-fire a command).
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  ai-commands:
+    # @v1: the series tag, moved only by `dev deploy gh` from an immutable
+    # release, never by a merge to main. The workflow there is the shell
+    # of the 1.x dispatcher this repo installs, and the job checks the two
+    # agree. A major bump is an edit here and to the installed release;
+    # `ai-flow adopt` re-pins this ref.
+    uses: d3mlabs/ai-flow/.github/workflows/ai-commands.yml@v1
+    secrets:
+      CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+      AI_FLOW_APP_ID: ${{ secrets.AI_FLOW_APP_ID }}
+      AI_FLOW_APP_PRIVATE_KEY: ${{ secrets.AI_FLOW_APP_PRIVATE_KEY }}

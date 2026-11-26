@@ -1,0 +1,49 @@
+# ai-flow per-repo configuration — copy to .github/ai-flow.yml in each
+# participating repo. The whole file is optional: without it, ai-flow ships
+# no model opinion and the agent CLI's account default applies.
+#
+# models: command name => agent model, plus an optional `default` blanket
+# covering unlisted commands. Valid names come from the ACP session
+# catalog, NOT from `agent --list-models` — that is a different naming
+# domain (ai-flow#84). A handle that fails to resolve dumps the catalog
+# (names + modelIds) in the run's error.
+# Precedence per command: models.<command> > models.default > CLI default.
+models:
+  default: claude-fable-5
+  # Per-command overrides, e.g. a heavier model for the code-writing pass.
+  # An exact catalog modelId also matches — that is how a thinking-effort
+  # variant is pinned:
+  # build: claude-fable-5[thinking=true,effort=high]
+
+# The org knowledge repo /learn --promote moves learnings into. Unset means
+# promotion refuses with a pointer here.
+# knowledge_repo: d3mlabs/knowledge
+
+# Learning capture (optional):
+# - on_build: /build's opportunistic learning capture — the build pass may
+#   split learning files into a separate proposal PR. Default on; set false
+#   for quiet repos.
+# learn:
+#   on_build: true
+
+# Workspace mode (optional): `persistent` gives /build one durable reused
+# checkout instead of a disposable tmpdir worktree — gitignored build state
+# (Unreal Intermediate/, Binaries/, …) stays warm across runs. Git state
+# still resyncs cold on every entry, and a flock serializes writers. Only
+# for repos whose builds are too expensive to start cold; leave unset
+# otherwise.
+# workspace: persistent
+
+# MCP policy (optional; deny-all when the section is absent — unapproved
+# servers never load). `allow` names servers from the repo's .cursor/mcp.json
+# the agent pass may use; everything else visible to the CLI is actively
+# disabled. `session.start`/`session.stop` are opaque repo-owned commands
+# the dispatcher runs around the agent pass (e.g. boot/quit the editor that
+# serves the MCP port) — stop runs in an ensure and must be idempotent.
+# A repo retiring MCP should keep `allow: []` one release to actively
+# revoke previously approved servers.
+# mcp:
+#   allow: [unreal-mcp]
+#   session:
+#     start: bin/agent-editor start
+#     stop: bin/agent-editor stop
