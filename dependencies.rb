@@ -9,5 +9,7 @@
 require "dev/deps"
 
 Dev::Deps.define do
-  gh "d3mlabs/ai-flow", "^1", assets: "ai-flow-*.zip"
+  group :build do
+    gh "d3mlabs/ai-flow", "^1", assets: "ai-flow-*.zip"
+  end
 end
